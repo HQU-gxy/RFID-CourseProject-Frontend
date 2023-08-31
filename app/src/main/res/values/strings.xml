@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">RFID_FuckClass</string>
+    <string name="title_records">签到记录</string>
+    <string name="title_management">用户管理</string>
+    <string name="username">用户名</string>
+    <string name="card_id">卡号</string>
+    <string name="sign_time">签到时间</string>
+    <string name="user_list">用户列表</string>
+    <string name="nfc_unsupported">你的设备不支持NFC！</string>
+    <string name="wait_4_card">等你刷卡…</string>
+    <string name="new_user">新用户</string>
+    <string name="new_username">新用户名</string>
+    <string name="edit">修改</string>
+    <string name="modify_username">改用户名</string>
+    <string name="rebind_card">重新绑定卡</string>
+    <string name="user_already_exist">已经🈶这个用户了</string>
+    <string name="success">彳亍了</string>
+    <string name="uid_already_exist">这个卡已经被绑定了</string>
+</resources>
