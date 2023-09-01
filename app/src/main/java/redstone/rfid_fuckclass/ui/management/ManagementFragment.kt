@@ -26,15 +26,16 @@ class ManagementFragment : Fragment() {
         val managementViewModel =
             ViewModelProvider(this)[ManagementViewModel::class.java]
 
-        usersDataSet=managementViewModel.usersDataSet
+        usersDataSet = managementViewModel.usersDataSet
         _binding = FragmentManagementBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         val usersList = binding.userList
-        val userListAdapter = UserListAdapter(usersDataSet)
+        val userListAdapter = UserListAdapter(usersDataSet, requireActivity())
         usersList.layoutManager = LinearLayoutManager(this.context)
         usersList.adapter = userListAdapter
 
+        binding.buttonNewUser.setOnClickListener(ButtonNewUserListener(requireContext(),requireActivity()))
         return root
     }
 
