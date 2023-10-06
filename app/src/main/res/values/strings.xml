@@ -16,4 +16,5 @@
     <string name="user_already_exist">已经🈶这个用户了</string>
     <string name="success">彳亍了</string>
     <string name="uid_already_exist">这个卡已经被绑定了</string>
+    <string name="remove_user">移除用户</string>
 </resources>

@@ -10,6 +10,7 @@ import android.nfc.tech.NfcA
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -82,12 +83,11 @@ class MainActivity : AppCompatActivity() {
             nfcAdapter.disableForegroundDispatch(this)
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        val tag: Tag? = if (Build.VERSION.SDK_INT >= 33) intent.getParcelableExtra(
-            NfcAdapter.EXTRA_TAG, Tag::class.java
-        ) else intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+        val tag: Tag? =  intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
 
         Log.i("tag", tag.toString())
         if (tag != null) {

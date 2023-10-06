@@ -11,18 +11,27 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import com.scwang.smart.refresh.layout.api.RefreshLayout
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import redstone.rfid_fuckclass.BuildConfig
 import redstone.rfid_fuckclass.MainActivity
 import redstone.rfid_fuckclass.R
 
 class EditButtonListener(
     private val username: String,
     private val uid: String,
-    private val context: Context, private val activity: Activity
+    private val context: Context,
+    private val activity: Activity,
+    private val refreshLayout: RefreshLayout
 ) : OnClickListener {
     override fun onClick(v: View?) {
         val options = arrayOf(
             context.resources.getString(R.string.modify_username),
-            context.resources.getString(R.string.rebind_card)
+            context.resources.getString(R.string.rebind_card),
+            context.resources.getString(R.string.remove_user)
         )
         val adbEdit = AlertDialog.Builder(context)
         adbEdit.setTitle("修改用户：$username")
@@ -38,14 +47,13 @@ class EditButtonListener(
                     ) { _, _ ->
                         val newUsername =
                             theView.findViewById<EditText>(R.id.textNewUsername).text.toString()
-                        Toast.makeText(context, "新用户名是$newUsername", Toast.LENGTH_SHORT).show()
+                        submitEdit(newUsername, null)
                     }
                     adbModifyUsername.setNegativeButton("算了", null)
                     adbModifyUsername.show()
                 }
 
                 1 -> {
-
                     if (!MainActivity.nfcSupported) {
                         Toast.makeText(
                             context,
@@ -90,19 +98,123 @@ class EditButtonListener(
                     val dialogRebind = adbRebindCard.show()
                     buttonConfirmUID.setOnClickListener {
                         val newId = cardIdTV.text.toString()
-                        Toast.makeText(context, "新卡片ID是$newId", Toast.LENGTH_SHORT).show()
-                        dialogRebind.dismiss()
+                        submitEdit(null, newId, dialogRebind)
                     }
 
+                }
+
+                2 -> {
+                    val adbRemoveUser = AlertDialog.Builder(context)
+                    adbRemoveUser.setTitle("删除用户：$username")
+                    adbRemoveUser.setPositiveButton("彳亍") { _, _ ->
+                        submitRemove()
+                    }
+                    adbRemoveUser.setNegativeButton("算了", null)
+                    adbRemoveUser.show()
                 }
             }
         }
         adbEdit.show()
     }
 
+    private fun submitEdit(
+        newUsername: String?,
+        newUId: String?,
+        dialog: AlertDialog? = null
+    ) {
+        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val formBodyBuilder = FormBody.Builder()
+        formBodyBuilder.add("uid", uid)
+        formBodyBuilder.add("to-change-uid", if (newUId == null) "0" else "1")
+        formBodyBuilder.add("to-change-name", if (newUsername == null) "0" else "1")
+        if (newUId != null) formBodyBuilder.add("new-uid", newUId)
+        if (newUsername != null) formBodyBuilder.add("new-name", newUsername)
+        val formBody = formBodyBuilder.build()
+
+        val request = Request.Builder()
+            .url("${BuildConfig.serverAddr}/modify_info").post(formBody).build()
+
+        Thread {
+            try {
+                val response = httpClient.newCall(request).execute()
+                val responseText = response.body?.string()
+                println(responseText)
+                val responseJSON = responseText?.let { JSONObject(it) } ?: return@Thread
+
+                if (responseJSON.getString("status").equals("SUC")) {
+                    activity.runOnUiThread {
+                        Toast.makeText(context, "修改成功", Toast.LENGTH_SHORT).show()
+                    }
+                } else if (responseJSON.getString("status").equals("UID_EXIST")) {
+                    activity.runOnUiThread {
+                        Toast.makeText(context, "这个卡已经添加过了", Toast.LENGTH_SHORT).show()
+                    }
+                } else if (responseJSON.getString("status").equals("NAME_EXIST")) {
+                    activity.runOnUiThread {
+                        Toast.makeText(context, "已经🈶这个用户了", Toast.LENGTH_SHORT).show()
+                    }
+                } else if (responseJSON.getString("status").equals("NO_USER")) {
+                    activity.runOnUiThread {
+                        Toast.makeText(context, "没这用户", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                activity.runOnUiThread{refreshLayout.autoRefresh()}
+            } catch (e: Exception) {
+                activity.runOnUiThread {
+                    Toast.makeText(context, "连不上服务器", Toast.LENGTH_SHORT).show()
+                }
+                e.printStackTrace()
+            }
+            dialog?.dismiss()
+        }.start()
+    }
+
+    private fun submitRemove() {
+        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val formBodyBuilder = FormBody.Builder()
+        formBodyBuilder.add("uid", uid)
+        val formBody = formBodyBuilder.build()
+        val request = Request.Builder()
+            .url("${BuildConfig.serverAddr}/del_user").post(formBody).build()
+        Thread {
+            try {
+                val response = httpClient.newCall(request).execute()
+                val responseText = response.body?.string()
+                println(responseText)
+                val responseJSON = responseText?.let { JSONObject(it) } ?: return@Thread
+                val status = responseJSON.getString("status")
+                Log.i("ServerStat", status)
+                when (status) {
+                    "SUC" -> activity.runOnUiThread {
+                        Toast.makeText(
+                            context,
+                            "删除成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    "NO_USER" ->
+                        activity.runOnUiThread {
+                            Toast.makeText(context, "没这用户", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                activity.runOnUiThread{refreshLayout.autoRefresh()}
+            } catch (e: Exception) {
+                activity.runOnUiThread {
+                    Toast.makeText(context, "连不上服务器", Toast.LENGTH_SHORT).show()
+                }
+                e.printStackTrace()
+            }
+        }.start()
+    }
 }
 
-class ButtonNewUserListener(private val context: Context, private val activity: Activity) :
+
+class ButtonNewUserListener(
+    private val context: Context,
+    private val activity: Activity,
+    private val refreshLayout: RefreshLayout
+) :
     OnClickListener {
     override fun onClick(v: View?) {
         if (!MainActivity.nfcSupported) {
@@ -160,12 +272,57 @@ class ButtonNewUserListener(private val context: Context, private val activity: 
             val dialogBind = adbBindCard.show()
             buttonConfirmUID.setOnClickListener {
                 val newId = cardIdTV.text.toString()
-                Toast.makeText(context, "用户名：$newUsername，卡片ID：$newId", Toast.LENGTH_SHORT).show()
-                dialogBind.dismiss()
+                submitNewUser(dialogBind, newUsername, newId)
             }
         }
         adbNewUser.setNegativeButton("算了", null)
         adbNewUser.show()
     }
 
+    private fun submitNewUser(dialog: AlertDialog, username: String, uid: String) {
+        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val formBodyBuilder = FormBody.Builder()
+        formBodyBuilder.add("name", username)
+        formBodyBuilder.add("uid", uid)
+        val formBody = formBodyBuilder.build()
+        val request = Request.Builder()
+            .url("${BuildConfig.serverAddr}/add_user").post(formBody).build()
+        Thread {
+            try {
+                val response = httpClient.newCall(request).execute()
+                val responseText = response.body?.string()
+                println(responseText)
+                val responseJSON = responseText?.let { JSONObject(it) } ?: return@Thread
+                val status = responseJSON.getString("status")
+                Log.i("ServerStat", status)
+                when (status) {
+                    "SUC" -> activity.runOnUiThread {
+                        Toast.makeText(
+                            context,
+                            "添加成功",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    "UID_EXIST" ->
+                        activity.runOnUiThread {
+                            Toast.makeText(context, "这个卡已经添加过了", Toast.LENGTH_SHORT).show()
+                        }
+
+                    "NAME_EXIST" ->
+                        activity.runOnUiThread {
+                            Toast.makeText(context, "已经🈶这个用户了", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                activity.runOnUiThread{refreshLayout.autoRefresh()}
+            } catch (e: Exception) {
+                activity.runOnUiThread {
+                    Toast.makeText(context, "连不上服务器", Toast.LENGTH_SHORT).show()
+                }
+                e.printStackTrace()
+            }
+            dialog.dismiss()
+
+        }.start()
+    }
 }

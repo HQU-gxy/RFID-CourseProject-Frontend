@@ -7,9 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.scwang.smart.refresh.layout.api.RefreshLayout
 import redstone.rfid_fuckclass.R
 
-class UserListAdapter(private val dataSet: MutableList<Array<String>>,private val activity:Activity) :
+class UserListAdapter(private val dataSet: MutableList<Array<String>>,private val activity:Activity,private val refreshLayout: RefreshLayout) :
     RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -33,7 +34,7 @@ class UserListAdapter(private val dataSet: MutableList<Array<String>>,private va
         val uid=dataSet[position][1]
         holder.usernameTV.text = username
         holder.uidTV.text = uid
-        holder.editButton.setOnClickListener(EditButtonListener(username,uid,holder.itemView.context, activity))
+        holder.editButton.setOnClickListener(EditButtonListener(username,uid,holder.itemView.context, activity, refreshLayout))
     }
 
     override fun getItemCount(): Int {
