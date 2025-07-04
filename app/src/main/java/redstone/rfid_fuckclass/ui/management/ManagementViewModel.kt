@@ -4,5 +4,5 @@ import androidx.lifecycle.ViewModel
 
 class ManagementViewModel : ViewModel() {
 
-    val usersDataSet:MutableList<Array<String>> = mutableListOf()
+    val usersDataSet: MutableList<Array<String>> = mutableListOf()
 }

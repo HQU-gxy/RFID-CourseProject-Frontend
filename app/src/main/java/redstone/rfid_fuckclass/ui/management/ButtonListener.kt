@@ -122,7 +122,8 @@ class EditButtonListener(
         newUId: String?,
         dialog: AlertDialog? = null
     ) {
-        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val httpClient =
+            OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
         val formBodyBuilder = FormBody.Builder()
         formBodyBuilder.add("uid", uid)
         formBodyBuilder.add("to-change-uid", if (newUId == null) "0" else "1")
@@ -158,7 +159,7 @@ class EditButtonListener(
                         Toast.makeText(context, "没这用户", Toast.LENGTH_SHORT).show()
                     }
                 }
-                activity.runOnUiThread{refreshLayout.autoRefresh()}
+                activity.runOnUiThread { refreshLayout.autoRefresh() }
             } catch (e: Exception) {
                 activity.runOnUiThread {
                     Toast.makeText(context, "连不上服务器", Toast.LENGTH_SHORT).show()
@@ -170,7 +171,8 @@ class EditButtonListener(
     }
 
     private fun submitRemove() {
-        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val httpClient =
+            OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
         val formBodyBuilder = FormBody.Builder()
         formBodyBuilder.add("uid", uid)
         val formBody = formBodyBuilder.build()
@@ -198,7 +200,7 @@ class EditButtonListener(
                             Toast.makeText(context, "没这用户", Toast.LENGTH_SHORT).show()
                         }
                 }
-                activity.runOnUiThread{refreshLayout.autoRefresh()}
+                activity.runOnUiThread { refreshLayout.autoRefresh() }
             } catch (e: Exception) {
                 activity.runOnUiThread {
                     Toast.makeText(context, "连不上服务器", Toast.LENGTH_SHORT).show()
@@ -280,7 +282,8 @@ class ButtonNewUserListener(
     }
 
     private fun submitNewUser(dialog: AlertDialog, username: String, uid: String) {
-        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val httpClient =
+            OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
         val formBodyBuilder = FormBody.Builder()
         formBodyBuilder.add("name", username)
         formBodyBuilder.add("uid", uid)
@@ -314,7 +317,7 @@ class ButtonNewUserListener(
                             Toast.makeText(context, "已经🈶这个用户了", Toast.LENGTH_SHORT).show()
                         }
                 }
-                activity.runOnUiThread{refreshLayout.autoRefresh()}
+                activity.runOnUiThread { refreshLayout.autoRefresh() }
             } catch (e: Exception) {
                 activity.runOnUiThread {
                     Toast.makeText(context, "连不上服务器", Toast.LENGTH_SHORT).show()

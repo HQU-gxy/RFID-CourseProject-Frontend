@@ -61,7 +61,8 @@ class ManagementFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun fetchUserList(refreshLayout: SmartRefreshLayout, userListAdapter: UserListAdapter) {
-        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val httpClient =
+            OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
         val request = Request.Builder()
             .url("${BuildConfig.serverAddr}/list_users").get().build()
 
@@ -86,8 +87,7 @@ class ManagementFragment : Fragment() {
 
                         }
                         activity?.runOnUiThread { userListAdapter.notifyDataSetChanged() }
-                    }
-                    else if (responseJSON.getString("status").equals("NO_RECORD")) {
+                    } else if (responseJSON.getString("status").equals("NO_RECORD")) {
                         usersDataSet.clear()
                         activity?.runOnUiThread { userListAdapter.notifyDataSetChanged() }
                     }

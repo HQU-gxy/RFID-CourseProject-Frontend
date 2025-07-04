@@ -10,17 +10,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import redstone.rfid_fuckclass.R
 
-class UserListAdapter(private val dataSet: MutableList<Array<String>>,private val activity:Activity,private val refreshLayout: RefreshLayout) :
+class UserListAdapter(
+    private val dataSet: MutableList<Array<String>>,
+    private val activity: Activity,
+    private val refreshLayout: RefreshLayout
+) :
     RecyclerView.Adapter<UserListAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val usernameTV: TextView
         val uidTV: TextView
-        val editButton:ImageButton
+        val editButton: ImageButton
+
         init {
             usernameTV = view.findViewById(R.id.textUsername)
             uidTV = view.findViewById(R.id.textUID)
-            editButton=view.findViewById(R.id.buttonEdit)
+            editButton = view.findViewById(R.id.buttonEdit)
         }
     }
 
@@ -30,11 +35,19 @@ class UserListAdapter(private val dataSet: MutableList<Array<String>>,private va
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val username=dataSet[position][0]
-        val uid=dataSet[position][1]
+        val username = dataSet[position][0]
+        val uid = dataSet[position][1]
         holder.usernameTV.text = username
         holder.uidTV.text = uid
-        holder.editButton.setOnClickListener(EditButtonListener(username,uid,holder.itemView.context, activity, refreshLayout))
+        holder.editButton.setOnClickListener(
+            EditButtonListener(
+                username,
+                uid,
+                holder.itemView.context,
+                activity,
+                refreshLayout
+            )
+        )
     }
 
     override fun getItemCount(): Int {

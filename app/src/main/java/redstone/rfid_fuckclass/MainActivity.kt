@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
 
-        val tag: Tag? =  intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
+        val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG, Tag::class.java)
 
         Log.i("tag", tag.toString())
         if (tag != null) {

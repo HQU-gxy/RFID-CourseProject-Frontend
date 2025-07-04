@@ -60,7 +60,8 @@ class RecordsFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     fun fetchRecords(refreshLayout: RefreshLayout, recordsListAdapter: RecordsListAdapter) {
-        val httpClient = OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
+        val httpClient =
+            OkHttpClient.Builder().connectTimeout(3, java.util.concurrent.TimeUnit.SECONDS).build()
         val request = Request.Builder()
             .url("${BuildConfig.serverAddr}/list_records").get().build()
 
@@ -84,8 +85,7 @@ class RecordsFragment : Fragment() {
                             )
                         }
                         activity?.runOnUiThread { recordsListAdapter.notifyDataSetChanged() }
-                    }
-                    else if (responseJSON.getString("status").equals("NO_RECORD")) {
+                    } else if (responseJSON.getString("status").equals("NO_RECORD")) {
                         recordsDataSet.clear()
                         activity?.runOnUiThread { recordsListAdapter.notifyDataSetChanged() }
                     }
