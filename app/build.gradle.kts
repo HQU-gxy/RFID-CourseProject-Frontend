@@ -15,7 +15,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "serverAddr", "\"http://dogfucker:2333\"")
+        buildConfigField("String", "serverAddr", "\"http://114.5.14.1:2333\"")
     }
 
     buildTypes {

@@ -87,6 +87,10 @@ class ManagementFragment : Fragment() {
                         }
                         activity?.runOnUiThread { userListAdapter.notifyDataSetChanged() }
                     }
+                    else if (responseJSON.getString("status").equals("NO_RECORD")) {
+                        usersDataSet.clear()
+                        activity?.runOnUiThread { userListAdapter.notifyDataSetChanged() }
+                    }
 
 
             } catch (e: Exception) {

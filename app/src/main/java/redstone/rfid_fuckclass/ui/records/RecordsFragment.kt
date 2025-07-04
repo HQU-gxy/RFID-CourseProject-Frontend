@@ -82,11 +82,13 @@ class RecordsFragment : Fragment() {
                                     record.getString("sign_dt")
                                 )
                             )
-
                         }
                         activity?.runOnUiThread { recordsListAdapter.notifyDataSetChanged() }
                     }
-
+                    else if (responseJSON.getString("status").equals("NO_RECORD")) {
+                        recordsDataSet.clear()
+                        activity?.runOnUiThread { recordsListAdapter.notifyDataSetChanged() }
+                    }
 
             } catch (e: Exception) {
                 activity?.runOnUiThread {
